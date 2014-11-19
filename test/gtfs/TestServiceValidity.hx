@@ -37,6 +37,12 @@ class TestServiceValidity {
         Assert.isTrue(s.validity.validFor(Monday || Thursday));
         Assert.isFalse(s.validity.validFor(Thursday));
         Assert.isFalse(s.validity.validFor(Monday && Thursday));
+
+        // works, but more complex cases might fail!!
+        Assert.isTrue(s.validity.validFor( (Monday && Thursday) || (Monday) ));
+        Assert.isTrue(s.validity.validFor( (Monday && Thursday) || (Monday && Tuesday) ));
+        Assert.isFalse(s.validity.validFor( (Monday && Thursday) && (Monday) ));
+        Assert.isFalse(s.validity.validFor( (Monday && Thursday) && (Monday && Tuesday) ));
     }
 
 }
