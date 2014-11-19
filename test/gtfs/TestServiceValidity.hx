@@ -9,6 +9,7 @@ class TestServiceValidity
 
     function new()
     {
+        // NOOP
     }
 
     function testStorage()
