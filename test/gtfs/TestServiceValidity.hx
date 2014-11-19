@@ -4,8 +4,7 @@ import gtfs.Types;
 import utest.Assert;
 
 @:publicFields
-class TestServiceValidity
-{
+class TestServiceValidity {
 
     function new()
     {
