@@ -1,0 +1,6 @@
+-neko TestAll.n
+-main TestAll
+-cp test
+-cp src
+-lib utest
+
