@@ -111,7 +111,7 @@ typedef StopTime = {
     var distTraveled:Null<Float>;
 }
 
-@:enum abstract Weekday(Int) {
+@:enum abstract Weekday(Int) from Int {
     var Sunday = 1;
     var Monday = 2;
     var Tuesday = 4;
@@ -142,7 +142,7 @@ typedef StopTime = {
 
 }
 
-abstract ServiceValidity(Int) {
+abstract ServiceValidity(Int) from Int {
 
     public function new(mask)
     {
@@ -192,5 +192,20 @@ typedef Service = {
     var validity:ServiceValidity;
     var startDate:GTFSDate;
     var endDate:GTFSDate;
+}
+
+typedef Calendar = {
+    var rules:Array<Service>;
+    // var exceptions:Array<Service>;
+}
+
+typedef Gtfs = {
+    var agencies:Array<Agency>;
+    var stations:Array<Station>;
+    var stops:Array<Stop>;
+    var route:Array<Route>;
+    var calendar:Calendar;
+    var trips:Array<Trip>;
+    var stopTimes:Array<StopTime>;
 }
 

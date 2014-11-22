@@ -21,6 +21,11 @@ class TestServiceValidity {
         Assert.equals(cast(Monday, Int) | cast(Tuesday, Int), cast(sv, Int));
         sv = Monday && Tuesday;
         Assert.equals(cast(Monday, Int) | cast(Tuesday, Int), cast(sv, Int));
+
+        sv = 1;
+        Assert.equals(Sunday, sv);
+        sv = 2;
+        Assert.equals(Monday, sv);
     }
 
     function testVerification()
