@@ -1,5 +1,6 @@
 package gtfs;
 
+import format.csv.Reader in CsvReader;
 import gtfs.Types;
 import haxe.io.BytesInput;
 import haxe.io.Input;
@@ -21,9 +22,17 @@ class Reader {
 
     function readAgencies()
     {
-        for (r in CsvReader.open(getFile("agency.txt"))) {
+        for (r in csvIterator(getFile("agency.txt"))) {
             // TODO
         }
+    }
+
+    // TODO improve lib csv API, then remove
+    function csvIterator(inp:Input)
+    {
+        var r = new CsvReader(",", "\"", "\n");  // FIXME support Unicode multiple EOL
+        r.reset(null, inp);
+        return r;
     }
 
     function getFile(name:String):Input {
@@ -32,79 +41,5 @@ class Reader {
         return new BytesInput(haxe.zip.Reader.unzip(x));
     }
 
-}
-
-class CsvReader {
-    var inp:Input;
-
-    function splitLine(line)
-    {
-        trace(line);
-        var v = [];
-        var pre = 0, cur = 0, end = 0;
-        var quoted = false;
-        while (cur < line.length) {
-            switch (line.charAt(cur)) {
-            case "\"":
-                if (!quoted) {
-                    quoted = true;
-                    pre = cur + 1;
-                } else if (cur + 1 < line.length && line.charAt(cur + 1) == "\"") {
-                    end = ++cur;
-                } else {
-                    quoted = false;
-                    end = cur - 1;
-                }
-            case ",":
-                if (!quoted && cur != pre) {
-                    v.push(StringTools.replace(line.substring(pre, end + 1), "\"\"", "\""));
-                    pre = cur + 1;
-                } else {
-                    end = cur;
-                }
-            case all:
-                end = cur;
-            }
-            cur++;
-        }
-        if (cur != pre)
-            v.push(StringTools.replace(line.substring(pre, end + 1), "\"\"", "\""));
-        trace(v);
-        return v;
-    }
-
-    function readHeader()
-    {
-        trace(splitLine(readLine()));
-    }
-
-    // normalize CRLF into LF
-    function readLine()
-    {
-        var raw = inp.readUntil("\n".code);
-        return StringTools.replace(raw, "\r", "");
-    }
-
-    function new(inp)
-    {
-        this.inp = inp;
-    }
-
-    public function hasNext()
-    {
-        return false;
-    }
-
-    public function next():Dynamic
-    {
-        return null;
-    }
-
-    public static function open(inp:Input)
-    {
-        var x = new CsvReader(inp);
-        x.readHeader();
-        return x;
-    }
 }
 

@@ -1,30 +1,28 @@
 package gtfs;
 
-import gtfs.Reader;
-import haxe.io.StringInput;
+import format.csv.*;
 import utest.Assert;
 
-@:access(gtfs.CsvReader)
 class TestCsvReader {
 
-    public function new()
+    public function new() {}
+
+    function split(line)
     {
+        return Reader.read(line)[0];
     }
 
-    public function testBasicSplit()
+    public function test01_BasicSplit()
     {
-        var s = "agency_id,agency_name,agency_url\n";  // TODO fix no ending \n
-        var o = new CsvReader(new StringInput(s));
-        Assert.same(["agency_id", "agency_name", "agency_url"],
-            o.splitLine(o.readLine()));
+        var s = "agency_id,agency_name,agency_url";
+        Assert.same(["agency_id", "agency_name", "agency_url"], split(s));
+        Assert.same(["agency_id", "agency_name", "agency_url"], split(StringTools.trim(s)));
     }
 
-    public function testEscapedSplit()
+    public function test02_EscapedSplit()
     {
-        var s = "\"agency\"\"_\"\"id\",agency_name,agency_url\n";  // TODO fix no ending \n
-        var o = new CsvReader(new StringInput(s));
-        Assert.same(["agency\"_\"id", "agency_name", "agency_url"],
-            o.splitLine(o.readLine()));
+        var s = "\"agency\"\"_\"\"id\",agency_name,agency_url\n";
+        Assert.same(["agency\"_\"id", "agency_name", "agency_url"], split(s)); 
     }
 
 }
