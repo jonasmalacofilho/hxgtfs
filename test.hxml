@@ -1,6 +1,6 @@
--neko TestAll.n
+--interp
 -main TestAll
 -cp test
--cp src
+-cp lib
 -lib utest
 
