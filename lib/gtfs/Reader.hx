@@ -22,17 +22,9 @@ class Reader {
 
     function readAgencies()
     {
-        for (r in csvIterator(getFile("agency.txt"))) {
+        for (r in new CsvReader().reset(getFile("agency.txt"))) {
             // TODO
         }
-    }
-
-    // TODO improve lib csv API, then remove
-    function csvIterator(inp:Input)
-    {
-        var r = new CsvReader(",", "\"", "\n");  // FIXME support Unicode multiple EOL
-        r.reset(null, inp);
-        return r;
     }
 
     function getFile(name:String):Input {

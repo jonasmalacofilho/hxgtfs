@@ -17,12 +17,15 @@ class TestCsvReader {
         var s = "agency_id,agency_name,agency_url";
         Assert.same(["agency_id", "agency_name", "agency_url"], split(s));
         Assert.same(["agency_id", "agency_name", "agency_url"], split(StringTools.trim(s)));
+        Assert.same(["agency_id", "agency_name", "agency_url"], split(StringTools.trim(s) + "\r\n"));
     }
 
     public function test02_EscapedSplit()
     {
         var s = "\"agency\"\"_\"\"id\",agency_name,agency_url\n";
         Assert.same(["agency\"_\"id", "agency_name", "agency_url"], split(s)); 
+        Assert.same(["agency\"_\"id", "agency_name", "agency_url"], split(StringTools.trim(s)));  
+        Assert.same(["agency\"_\"id", "agency_name", "agency_url"], split(StringTools.trim(s) + "\r\n"));
     }
 
 }
