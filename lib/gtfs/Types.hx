@@ -6,7 +6,7 @@ typedef Pos = {
 }  // WGS84
 
 typedef Agency = {
-    var id:String;
+    var id:Null<String>;
     var name:String;
     var url:String;
     var timezone:String;
