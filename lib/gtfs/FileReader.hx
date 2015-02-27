@@ -37,16 +37,32 @@ class RecordReader {
         return f == "" ? null : f;
     }
 
+    public function nullableInt(fieldName:String):Null<Int>
+    {
+        var f = emptyAsNull(fieldName);
+        return f != null ? Std.parseInt(f) : null;
+    }
+
     public function int(fieldName:String):Int
     {
-        var f = field(fieldName);
-        return f != null ? Std.parseInt(f) : 0;
+        var i = Std.parseInt(notEmpty(fieldName));  // FIXME
+        if (i == null)
+            throw null;  // FIXME
+        return i;
+    }
+
+    public function nullableFloat(fieldName:String):Null<Float>
+    {
+        var f = emptyAsNull(fieldName);
+        return f != null ? Std.parseFloat(f) : null;
     }
 
     public function float(fieldName:String):Float
     {
-        var f = field(fieldName);
-        return f != null ? Std.parseFloat(f) : 0.;
+        var i = Std.parseFloat(notEmpty(fieldName));  // FIXME
+        if (i == null)
+            throw null;  // FIXME
+        return i;
     }
 
     public function new(fileReader, record)

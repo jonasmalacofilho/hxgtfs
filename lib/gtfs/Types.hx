@@ -21,27 +21,26 @@ typedef BaseStop = {
     var name:String;
     var desc:Null<String>;  // description
     var pos:Pos;
-    var zoneId:Null<String>;
     var url:Null<String>;
     var timezone:Null<String>;
     var wheelchairBoarding:AccessibilityInfo;
 }
 
-@:enum abstract AccessibilityInfo(Int) {
-    var NoInfo = 0;
-    var Some = 1;
-    var None = 2;
-    var Inherit = -99;  // [OFFSPEC] requires station
+@:enum abstract AccessibilityInfo(Int) from Int {
+    var ANoInfo = 0;
+    var ASome = 1;
+    var ANone = 2;
+    var AInherit = -99;  // [OFFSPEC] requires station
 }
 
 typedef Station = {
     > BaseStop,
-    var stops:Array<Stop>;
 }
 
 typedef Stop = {
     > BaseStop,
-    var station:Null<Station>;  // parent
+    var stationId:Null<String>;  // parent
+    var zoneId:Null<String>;
 }
 
 @:enum abstract RouteType(Int) {
@@ -200,9 +199,9 @@ typedef Calendar = {
 }
 
 typedef Gtfs = {
-    var agencies:Array<Agency>;
-    var stations:Array<Station>;
-    var stops:Array<Stop>;
+    var agencies:Map<Null<String>, Agency>;
+    var stations:Map<String, Station>;
+    var stops:Map<String, Stop>;
     var route:Array<Route>;
     var calendar:Calendar;
     var trips:Array<Trip>;

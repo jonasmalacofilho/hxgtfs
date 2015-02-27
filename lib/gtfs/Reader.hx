@@ -4,11 +4,12 @@ import gtfs.Error;
 import gtfs.FileReader;
 import gtfs.Types;
 import haxe.io.Input;
+using gtfs.Helpers;
 
 class Reader {
     var zip:List<haxe.zip.Entry>;
     var file:FileReader;
-    var gtfs:Gtfs;
+    var ctx:Gtfs;
 
     function openFile(fileName:String):FileReader
     {
@@ -27,29 +28,76 @@ class Reader {
                 phone :    r.emptyAsNull("agency_phone"),
                 fareUrl :  r.emptyAsNull("agency_fare_url")
             };
-            if (Lambda.exists(gtfs.agencies, function (a) return a.id == agency.id))
+            if (ctx.agencies.exists(agency.id))
                 throw EFieldValueNotUnique("agency_id", file.makeErrPos());
-            gtfs.agencies.push(agency);
+            ctx.agencies.set(agency.id, agency);
         }
-        // TODO check for missing id if gtfs.agencies.length > 1
+
+        if (Lambda.count(ctx.agencies) > 1 && (ctx.agencies.exists(null) || ctx.agencies.exists("")))
+            throw null;  // FIXME
+    }
+
+    function readStops()
+    {
+        for (r in openFile("stops.txt")) {
+            var base:BaseStop = {
+                id : r.notEmpty("stop_id"),
+                code : r.emptyAsNull("stop_code"),
+                name : r.notEmpty("stop_name"),  // annoying for testing?
+                desc : r.emptyAsNull("stop_desc"),
+                pos : {
+                    lat : r.float("stop_lat"),
+                    lon : r.float("stop_lon")
+                },
+                url : r.emptyAsNull("stop_url"),
+                timezone : r.emptyAsNull("stop_timezone"),
+                wheelchairBoarding : r.nullableInt("wheelchair_boarding").coalesce(0)
+            };
+            if (ctx.stations.exists(base.id) || ctx.stops.exists(base.id))
+                throw EFieldValueNotUnique("stop_id", file.makeErrPos());
+
+            switch (r.field("location_type")) {
+            case "0", "", null:
+                var stop:Stop = cast base;
+                stop.stationId = r.emptyAsNull("parent_station");
+                stop.zoneId = r.emptyAsNull("zone_id");
+                ctx.stops.set(stop.id, stop);
+            case "1":
+                var station:Station = cast base;
+                if (station.wheelchairBoarding == ANoInfo)
+                    station.wheelchairBoarding = AInherit;
+                ctx.stations.set(station.id, station);
+            case _:
+                throw null;  // FIXME
+            }
+        }
     }
 
     function readAll()
     {
         readAgencies();
+        readStops();
     }
 
     function new(input:Input)
     {
         zip = haxe.zip.Reader.readZip(input);
-        gtfs = cast { agencies : [] };
+        ctx = {
+            agencies : new Map(),
+            stations : new Map(),
+            stops : new Map(),
+            route : null,
+            calendar : null,
+            trips : null,
+            stopTimes : null,
+        };
     }
 
     public static function read(input:Input)
     {
         var x = new Reader(input);
         x.readAll();
-        return x.gtfs;
+        return x.ctx;
     }
 }
 
