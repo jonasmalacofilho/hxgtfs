@@ -1,0 +1,5 @@
+package gtfs;
+
+class GtfsFormatTools {
+}
+

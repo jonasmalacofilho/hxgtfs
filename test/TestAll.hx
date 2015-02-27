@@ -14,8 +14,8 @@ class TestAll {
         Report.create(r);
         // r.run();
 
-        var x = new gtfs.Reader();
-        x.readArchive(sys.io.File.read("data/sample-feed.zip", true));
+        var sample = gtfs.Reader.read(sys.io.File.read("data/sample-feed.zip", true));
+        trace(sample);
     }
 
 }

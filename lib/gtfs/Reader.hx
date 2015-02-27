@@ -1,59 +1,55 @@
 package gtfs;
 
-import format.csv.Reader in CsvReader;
+import gtfs.Error;
+import gtfs.FileReader;
 import gtfs.Types;
-import haxe.io.BytesInput;
 import haxe.io.Input;
-using gtfs.CsvTools;
 
 class Reader {
     var zip:List<haxe.zip.Entry>;
-    var ctx:Gtfs;
+    var file:FileReader;
+    var gtfs:Gtfs;
 
-
-    function openFile(name:String):Input
+    function openFile(fileName:String):FileReader
     {
-        var x = Lambda.find(zip, function (e) return e.fileName == name);
-        // TODO check for null
-        return new BytesInput(haxe.zip.Reader.unzip(x));
+        return file = new FileReader(zip, fileName);
     }
 
-    function openTable(name:String)
+    function readAgencies()
     {
-        return new CsvReader().reset(openFile("agency.txt")).openAsTable();
+        for (r in openFile("agency.txt")) {
+            var agency = {
+                id :       r.emptyAsNull("agency_id"),
+                name :     r.notEmpty("agency_name"),
+                url :      r.notEmpty("agency_url"),
+                timezone : r.notEmpty("agency_timezone"),
+                lang :     r.emptyAsNull("agency_lang"),
+                phone :    r.emptyAsNull("agency_phone"),
+                fareUrl :  r.emptyAsNull("agency_fare_url")
+            };
+            if (Lambda.exists(gtfs.agencies, function (a) return a.id == agency.id))
+                throw EIdMustBeUnique("agency_id", file.makeErrPos());
+            gtfs.agencies.push(agency);
+        }
+        // TODO check for missing id if gtfs.agencies.length > 1
     }
 
-    public function openArchive(inp:Input)
+    function readAll()
     {
-        zip = haxe.zip.Reader.readZip(inp);
-    }
-
-    public function readAgencies()
-    {
-        var agencies = [for (r in openTable("agency.txt")) {
-            id : r["agency_id"].emptyAsNull(),
-            name : r["agency_name"].notEmpty(),
-            url : r["agency_url"].notEmpty(),
-            timezone : r["agency_timezone"].notEmpty(),
-            lang : r["agency_lang"].emptyAsNull(),
-            phone : r["agency_phone"].emptyAsNull(),
-            fareUrl : r["agency_fare_url"].emptyAsNull()
-        }];
-        ctx.agencies = ctx.agencies.concat(agencies);
-        trace(ctx.agencies);
-    }
-
-    public function readArchive(inp:Input)
-    {
-        openArchive(inp);
         readAgencies();
-        // TODO
     }
 
-    public function new()
+    function new(input:Input)
     {
-        ctx = cast { agencies : [] };
+        zip = haxe.zip.Reader.readZip(input);
+        gtfs = cast { agencies : [] };
     }
 
+    public static function read(input:Input)
+    {
+        var x = new Reader(input);
+        x.readAll();
+        return x.gtfs;
+    }
 }
 
