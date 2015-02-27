@@ -28,7 +28,7 @@ class Reader {
                 fareUrl :  r.emptyAsNull("agency_fare_url")
             };
             if (Lambda.exists(gtfs.agencies, function (a) return a.id == agency.id))
-                throw EIdMustBeUnique("agency_id", file.makeErrPos());
+                throw EFieldValueNotUnique("agency_id", file.makeErrPos());
             gtfs.agencies.push(agency);
         }
         // TODO check for missing id if gtfs.agencies.length > 1
