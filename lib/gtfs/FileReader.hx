@@ -46,8 +46,8 @@ class RecordReader {
     public function int(fieldName:String):Int
     {
         var i = Std.parseInt(notEmpty(fieldName));  // FIXME
-        if (i == null)
-            throw null;  // FIXME
+        if (i == null)  // TODO validation improvements
+            throw ENotInt(fieldName, field(fieldName), file.makeErrPos());
         return i;
     }
 
@@ -60,8 +60,8 @@ class RecordReader {
     public function float(fieldName:String):Float
     {
         var i = Std.parseFloat(notEmpty(fieldName));  // FIXME
-        if (i == null)
-            throw null;  // FIXME
+        if (i == null)  // TODO validation improvements
+            throw ENotFloat(fieldName, field(fieldName), file.makeErrPos());
         return i;
     }
 

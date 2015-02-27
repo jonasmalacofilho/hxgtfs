@@ -29,12 +29,12 @@ class Reader {
                 fareUrl :  r.emptyAsNull("agency_fare_url")
             };
             if (ctx.agencies.exists(agency.id))
-                throw EFieldValueNotUnique("agency_id", file.makeErrPos());
+                throw EFieldValueNotUnique("agency_id", agency.id, file.makeErrPos());
             ctx.agencies.set(agency.id, agency);
         }
 
         if (Lambda.count(ctx.agencies) > 1 && (ctx.agencies.exists(null) || ctx.agencies.exists("")))
-            throw null;  // FIXME
+            throw EEmptyFieldNotAllowed("agency_id", file.makeErrPos());
     }
 
     function readStops()
@@ -54,7 +54,7 @@ class Reader {
                 wheelchairBoarding : r.nullableInt("wheelchair_boarding").coalesce(0)
             };
             if (ctx.stations.exists(base.id) || ctx.stops.exists(base.id))
-                throw EFieldValueNotUnique("stop_id", file.makeErrPos());
+                throw EFieldValueNotUnique("stop_id", base.id, file.makeErrPos());
 
             switch (r.field("location_type")) {
             case "0", "", null:
@@ -67,10 +67,12 @@ class Reader {
                 if (station.wheelchairBoarding == ANoInfo)
                     station.wheelchairBoarding = AInherit;
                 ctx.stations.set(station.id, station);
-            case _:
-                throw null;  // FIXME
+            case other:
+                throw EUnexpectedFieldContents("location_type", other, file.makeErrPos());
             }
         }
+
+        // TODO check the relation between stations and stops
     }
 
     function readAll()
